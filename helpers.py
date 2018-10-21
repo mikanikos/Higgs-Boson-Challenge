@@ -1,5 +1,15 @@
 import numpy as np
 
+def build_k_indices(y, k_fold, seed):
+    """build k indices for k-fold."""
+    num_row = y.shape[0]
+    interval = int(num_row / k_fold)
+    np.random.seed(seed)
+    indices = np.random.permutation(num_row)
+    k_indices = [indices[k * interval: (k + 1) * interval] for k in range(k_fold)]
+    return np.array(k_indices)
+
+
 def build_poly(x, degree):
     """polynomial basis functions for input data x, for j=0 up to j=degree."""
     poly = np.ones((len(x), 1))
@@ -7,16 +17,12 @@ def build_poly(x, degree):
         poly = np.c_[poly, np.power(x, deg)]
     return poly
 
-def compute_gradient(y, tx, w):
-    error = y - tx.dot(w)
-    gradient = -tx.T.dot(error) / len(error)
-    return gradient, error
 
 def standardize(x):
     """Standardize the original data set."""
-    mean_x = np.mean(x)
+    mean_x = np.mean(x, axis=0)
     x = x - mean_x
-    std_x = np.std(x)
+    std_x = np.std(x, axis=0)
     x = x / std_x
     return x, mean_x, std_x
 
@@ -71,4 +77,15 @@ def split_data(x, y, ratio, myseed=1):
     x_te = x[index_te]
     y_tr = y[index_tr]
     y_te = y[index_te]
-    return x_tr, x_te, y_tr, y_te
+    return x_tr, x_te, y_tr, 
+
+
+def compute_accuracy(y_true, y_pred):
+    return sum(np.array(y_pred) == np.array(y_true)) / float(len(y_true))
+
+
+def clean_data(x):
+    x[x == -999] = np.nan
+    median_x = np.nanmedian(x, axis=0)
+    x = np.where(np.isnan(x), median_x, x)
+    return x
