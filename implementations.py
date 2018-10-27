@@ -4,10 +4,6 @@ from proj1_helpers import *
 from helpers import *
 from costs import *
 
-y, tx, _ = load_csv_data("data/train.csv")
-#yb_te, input_data_te, ids_te = load_csv_data("data/test.csv")
-
-
 def least_squares_GD(y, tx, initial_w, max_iters, gamma):
     w = initial_w
     for i in range(max_iters):
@@ -26,11 +22,21 @@ def least_squares_SGD(y, tx, initial_w, max_iters, gamma):
             w = w - gamma * gradient
     return w, loss
 
+def logistic_GD(y, tx, initial_w, max_iters, gamma):
+    w = initial_w
+    for i in range(max_iters):
+        gradient, loss = compute_gradient(y, tx, w, func="logistic")
+        w = w - gamma * gradient
+    return w, loss
 
 def least_squares(y, tx):
-    return np.linalg.solve(tx.T.dot(tx), tx.T.dot(y))
+    w = np.linalg.solve(tx.T.dot(tx), tx.T.dot(y))
+    loss = compute_loss(y, tx, w)
+    return w, loss
 
 
 def ridge_regression(y, tx, lambda_):
     I = lambda_ * np.identity(tx.shape[1])
-    return np.linalg.solve(tx.T.dot(tx) + I, tx.T.dot(y))
+    w = np.linalg.solve(tx.T.dot(tx) + I, tx.T.dot(y))
+    loss = compute_loss(y, tx, w)
+    return w, loss

@@ -1,4 +1,6 @@
 import numpy as np
+from costs import *
+
 
 def build_poly(x, degree):
     """polynomial basis functions for input data x, for j=0 up to j=degree."""
@@ -7,19 +9,35 @@ def build_poly(x, degree):
         poly = np.c_[poly, np.power(x, deg)]
     return poly
 
-def compute_gradient(y, tx, w):
+def compute_accuracy(y_true, y_pred):
+    accuracy = (sum(y_true == y_pred))/len(y_pred)
+    return accuracy
+
+def compute_gradient(y, tx, w, func="mse"):
+    if func == "mse":
+        return compute_mse_gradient(y, tx, w)
+    elif func == "logistic":
+        return compute_logistic_gradient(y, tx, w)
+
+def compute_mse_gradient(y, tx, w):
     error = y - tx.dot(w)
     gradient = -tx.T.dot(error) / len(error)
     return gradient, error
 
+def compute_logistic_gradient(y, tx, w):
+    """compute the gradient of loss."""
+    pred = sigmoid(tx.dot(w))
+    grad = tx.T.dot(pred - y)
+    loss = compute_loss(y, tx, w, func="logistic")
+    return grad, loss
+
 def standardize(x):
     """Standardize the original data set."""
-    mean_x = np.mean(x)
-    x = x - mean_x
-    std_x = np.std(x)
-    x = x / std_x
-    return x, mean_x, std_x
-
+    means = np.mean(x, axis=0)
+    x = x-means
+    stds = np.std(x, axis=0)
+    x = x/stds
+    return x, means, stds
 
 def build_model_data(height, weight):
     """Form (y,tX) to get regression data in matrix form."""
