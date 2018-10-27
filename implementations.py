@@ -48,7 +48,7 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma):
 def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
     w = initial_w
     for iter in range(max_iters):
-        loss = calculate_loss_log_reg(y, tx, w) + lambda_ * np.squeeze(w.T.dot(w))
-        gradient = calculate_gradient_log_reg(y, tx, w) + 2 * lambda_ * w
+        loss = calculate_loss_log_reg(y, tx, w) # + (1/2) * lambda_ * w.T.dot(w)
+        gradient = calculate_gradient_log_reg(y, tx, w)
         w = w - gamma * gradient
     return w, loss

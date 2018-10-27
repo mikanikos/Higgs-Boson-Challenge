@@ -18,22 +18,9 @@ def build_poly(x, degree):
     return poly
 
 
-def standardize(x):
+def standardize(tx):
     """Standardize the original data set."""
-    mean_x = np.mean(x, axis=0)
-    x = x - mean_x
-    std_x = np.std(x, axis=0)
-    x = x / std_x
-    return x, mean_x, std_x
-
-
-def build_model_data(height, weight):
-    """Form (y,tX) to get regression data in matrix form."""
-    y = weight
-    x = height
-    num_samples = len(y)
-    tx = np.c_[np.ones(num_samples), x]
-    return y, tx
+    return (tx - np.mean(tx, axis=0)) / np.std(tx, axis=0)
 
 
 def batch_iter(y, tx, batch_size, num_batches=1, shuffle=True):
@@ -77,7 +64,7 @@ def split_data(x, y, ratio, myseed=1):
     x_te = x[index_te]
     y_tr = y[index_tr]
     y_te = y[index_te]
-    return x_tr, x_te, y_tr, 
+    return x_tr, x_te, y_tr, y_te
 
 
 def compute_accuracy(y_true, y_pred):
@@ -86,6 +73,27 @@ def compute_accuracy(y_true, y_pred):
 
 def clean_data(x):
     x[x == -999] = np.nan
-    median_x = np.nanmedian(x, axis=0)
-    x = np.where(np.isnan(x), median_x, x)
-    return x
+    median_x = np.nanmean(x, axis=0)
+    return np.where(np.isnan(x), median_x, x)
+
+def add_constants(x, y):
+    return np.c_[np.ones((y.shape[0], 1)), x]
+
+def preprocess_data(tx_tr, tx_te, y_tr, y_te):
+    
+    #stds = np.std(tx_tr, axis=0)
+    #deleted_cols_ids = np.where(stds == 0)
+
+    #tx_tr = np.delete(tx_tr, deleted_cols_ids, axis=1)
+    #tx_te = np.delete(tx_te, deleted_cols_ids, axis=1)
+
+    tx_tr = clean_data(tx_tr)
+    tx_te = clean_data(tx_te)
+
+    tx_tr = standardize(tx_tr) 
+    tx_te = standardize(tx_te)
+
+    tx_tr = add_constants(tx_tr, y_tr)
+    tx_te = add_constants(tx_te, y_te)
+
+    return tx_tr, tx_te
