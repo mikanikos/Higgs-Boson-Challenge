@@ -13,7 +13,7 @@ def least_squares_GD(y, tx, initial_w, max_iters, gamma):
     return w, loss
 
 
-def least_squares_SGD(y, tx, initial_w, max_iters, gamma):
+def least_squares_SGD(y, tx, initial_w, max_iters, gamma, batch_size=1):
     w = initial_w
     for i in range(max_iters):
         for y_batch, tx_batch in batch_iter(y, tx, batch_size=batch_size, num_batches=1):
@@ -27,6 +27,14 @@ def logistic_GD(y, tx, initial_w, max_iters, gamma):
     for i in range(max_iters):
         gradient, loss = compute_gradient(y, tx, w, func="logistic")
         w = w - gamma * gradient
+    return w, loss
+
+def logistic_SGD(y, tx, initial_w, max_iters, gamma, batch_size=1):
+    w = initial_w
+    for i in range(max_iters):
+        for y_batch, tx_batch in batch_iter(y, tx, batch_size=batch_size, num_batches=1):
+            gradient, loss = compute_gradient(y_batch, tx_batch, w, func="logistic")
+            w = w - gamma * gradient
     return w, loss
 
 def least_squares(y, tx):
