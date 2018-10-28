@@ -1,0 +1,22 @@
+We began by implementing training methods from the least squares family – least squares with normal equations, least squares with gradient descent and least squares with a regularizing term (ridge regression).
+
+Initially, we trained models using arbitrary hyper-parameters just to test if our training implementations were functional. We were able to obtain 74% accuracy on the testing data using least squares with normal equations. In contrast, least squares with (stochastic) gradient descent was only able to achieve 71% accuracy on the test data.
+
+To improve our model, our first idea was to tune hyper-parameters - the hyper-parameters we had selected for each training method were unlikely to be the best ones. To do this, we needed first to implement cross validation, because we needed to see how each model performed when trained with different hyper-parameters. The submission limit on Kaggle meant that we could not use test set submissions in order to do this.
+
+Next, we defined [insert function name here]. This function performs a grid search over models trained using several possible combinations of hyper-parameters. For each training algorithm, we chose the model that maximized the accuracy on the cross-validation data set. We chose to do this rather than choosing the model that minimized the cost, because for a binary prediction, we believe accuracy to be more representative of performance than squared error.
+
+Additionally, we implemented [insert function name here] to allow for polynomial feature expansion and therefore more complex models. With the inherently large values of high-degree terms, we also implemented feature-wise standardization to keep the scale of each feature similar. Notably, we recognized that standardization is a transformation of our given feature data, so we used the mean and standard deviation of our training set on our testing set as well. This means that rather than standardizing the features of our test set, we instead apply the same transformation to them that standardized our training set.
+
+Using cross-validation and hyper-parameter tuning over polynomial degree and lambdas, we were able to improve our results to 79% accuracy on the training submission. Notably, with these optimizations, we saw that ridge regression was now able to consistently outperform the non-regularized models. Our best ridge regression model was using standardized data with 7th degree polynomial expansion and lambda = 100. We felt confident in this being an optimum because both 6th and 8th degree models were performing worse over a wide range of lambdas.
+
+To improve our predictions, we felt it necessary to implement logistic regression. Since we were attempting to predict a binary feature, we figured that a classifier would be superior to a regression. To our surprise, this was not the case. Initially this model performed worse than ridge regression (only able to obtain 74% accuracy) and each further change we made to our methods that increased the performance of logistic regression also improved ridge regression.
+
+We were unable to make improvements to our models using hyper-parameter tuning, so we began to look for feature engineering solutions. We noticed two main opportunities for optimizations – poorly recorded values and categorical data.
+
+For poorly recorded values, we noticed that large portions of the dataset were recorded as exactly -999. Due to their exactness, and high distance from other values, we believe that these recordings represent missing data or data recorded with malfunctioning equipment. Therefore, we have imputed these data to the mean of their respective columns. Under standardization this will cause the deviation between two accurately recorded data points to be more representative.
+
+For categorical data, we noticed that our jet number feature (column 22) only took on discrete values 0, 1, 2 and 3. Intuitively, even though these values are numeric, the natural ordering does not seem meaningful. We have split this feature into four indicator features; each of these new features will be given a separate coefficient under our model.
+
+Using these methods, we improved both ridge regression and logistic regression estimates. In particular, we obtained our maximum prediction, which is 80% accurate on the training submission. This prediction is formed using ridge regression with 7th degree polynomial expansion and lambda = 100. Logistic regression was able to achieve 76% accuracy on the training submission, using degree [not sure?].
+
