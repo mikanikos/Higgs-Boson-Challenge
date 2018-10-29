@@ -19,8 +19,8 @@ The project is organized in several files in order to guarantee modularity and h
  	Gradient Descent, "sigmoid" for computing the loss and the gradient for Logistic Regression and 
  	"compute_accuracy" for assessing model performance.
  - `proj1_helpers.py` is a script with some useful functions for loading data and generating the predictions. 
- - `cross_validation.py` contains some utlities for the local testing of the models and some
- 	hyper-parameters tuning methods for getting the best parameters. 
+ - `cross_validation.py` contains some utilities for the local testing of the models and some
+ 	hyper-parameters tuning methods for getting the best parameters.
  - `plots.py` contains tools for plotting and testing hyper-parameters.
  - `run.py` is the script for generating the best submission achieved (accuracy = 0.817).
 
@@ -49,7 +49,9 @@ You will see some output on the screen. Once "Done" appears, you will be able to
 
 ## Notes
 
-The hyper-parameters and the model used for the best prediction are hard coded in `run.py` and they can be changed in order to try other configurations and obtain different results.
+The optimal hyperparameters found are hard-coded in run.py, but it still executes learning on these parameters; it does not simply output the output that was found in testing. Users can run it to find the same results in testing. To find these parameters, we have used cross_validation.py
+
+For logistic regression, it is worth noting that some data generate NaN costs, due to limitations of machine number precision. In theory, sigmoid can never return 0 for any real numbers, and therefore logarithms of all sigmoid outputs should be valid -- however due to machine rounding 0 can be returned by sigmoid, which causes generation of NaN costs. Notably this does not cause failure in computation of the gradient, therefore gradient descent is not negatively influenced from this fact.
 
 ## Authors 
 
