@@ -45,7 +45,7 @@ def least_squares(y, tx):
 def ridge_regression(y, tx, lambda_):
     # computing the weights by using the formula
     lambda_prime = 2 * tx.shape[0] * lambda_ 
-    w = np.dot(np.dot(np.linalg.inv(np.dot(tx.T, tx) + lambda_prime * np.identity(tx.shape[1])), tx.T), y)
+    w = np.dot(np.dot(np.linalg.inv(np.dot(tx.T, tx) + lambda_ * np.identity(tx.shape[1])), tx.T), y)
     # return w with the corresponding loss 
     return w, compute_loss(y, tx, w)
 
@@ -73,4 +73,4 @@ def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
         # updating the weights
         w = w - gamma * gradient
     # return w with the corresponding loss and the regularizing term
-    return w, compute_loss_log_reg(y, tx, w) + (1/2) * lambda_ * np.squares(np.linalg.norm(w))
+    return w, compute_loss_log_reg(y, tx, w) + (1/2) * lambda_ * (np.linalg.norm(w)**2)

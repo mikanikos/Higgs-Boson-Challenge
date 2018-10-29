@@ -3,7 +3,7 @@ import numpy as np
 from implementations import *
 from helpers import compute_accuracy, split_data
 from data_processing import process_data, build_poly, expand_data, add_constants, clean_data
-from costs import compute_loss
+from costs import compute_loss, compute_loss_log_reg
 from proj1_helpers import predict_labels
 
 
@@ -30,22 +30,26 @@ def cross_validation(y, x, k_indices, k, lambda_, degree):
     tx_te = x[te_indice]
     tx_tr = x[tr_indice]
 
-    tx_tr, tx_te = expand_data(degree, tx_tr, tx_te)
+    #tx_tr, tx_te = expand_data(degree, tx_tr, tx_te)
 
     # Preprocessing data: cleaning, standardazing and adding constant column
-    #tx_tr, tx_te = process_data(tx_tr, tx_te, y_tr, y_te)
+    tx_tr, tx_te = process_data(tx_tr, tx_te, y_tr, y_te)
 
     # Feature augmentation through polynomials
-    #tx_tr = build_poly(tx_tr, degree)
-    #tx_te = build_poly(tx_te, degree)
+    tx_tr = build_poly(tx_tr, degree)
+    tx_te = build_poly(tx_te, degree)
 
     # Printing degree and lambda tested
     print("Test: d = ", degree, "; l = ", lambda_)
 
     # Training with ridge regression
+    #w, loss = reg_logistic_regression(y_tr, tx_tr, lambda_, initial_w=np.zeros(tx_tr.shape[1]), max_iters=30, gamma=0.001)
+    #w, _ = least_squares_GD(y_tr, tx_tr, initial_w=np.zeros(tx_tr.shape[1]), max_iters=50, gamma=0.1)
+    #w, _ = least_squares_SGD(y_tr, tx_tr, initial_w=np.zeros(tx_tr.shape[1]), max_iters=100, gamma=0.01)
+    #w, _ = least_squares(y_tr, tx_tr)
     w, _ = ridge_regression(y_tr, tx_tr, lambda_)
-    
-    #w, _ = reg_logistic_regression(y_tr, tx_tr, lambda_, initial_w=np.zeros(tx_tr.shape[1]), max_iters=100, gamma=0.1)
+    #w, _ = logistic_regression(y_tr, tx_tr, initial_w=np.zeros(tx_tr.shape[1]), max_iters=30, gamma=0.001)
+    #w, loss = reg_logistic_regression(y_tr, tx_tr, lambda_, initial_w=np.zeros(tx_tr.shape[1]), max_iters=30, gamma=0.1)
 
     # Computing prediction vector
     y_pred = predict_labels(w, tx_te)
