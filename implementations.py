@@ -44,8 +44,8 @@ def least_squares(y, tx):
 # Ridge regression
 def ridge_regression(y, tx, lambda_):
     # computing the weights by using the formula
-    lambda_prime = 2 * tx.shape[0] * lambda_ 
-    w = np.dot(np.dot(np.linalg.inv(np.dot(tx.T, tx) + lambda_ * np.identity(tx.shape[1])), tx.T), y)
+    lambda_prime = 2 * tx.shape[0] * lambda_
+    w = np.dot(np.dot(np.linalg.inv(np.dot(tx.T, tx) + lambda_prime * np.identity(tx.shape[1])), tx.T), y)
     # return w with the corresponding loss 
     return w, compute_loss(y, tx, w)
 

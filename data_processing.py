@@ -1,14 +1,6 @@
 import numpy as np
 
 
-# Adding polynomial features up to the selected degree
-def build_poly(x, degree):
-    poly_x = np.ones((len(x), 1))
-    for d in range(1, degree+1):
-        poly_x = np.c_[poly_x, np.power(x, d)]
-    return poly_x
-
-
 # Cleaning data from -999 values
 def clean_data(x):
 	## Convert -999 to NaN as we believe these are misidentified data
@@ -29,10 +21,6 @@ def standardize(x):
     x = x/stds
     return x, means, stds
 
-# Standardizing by subtracting the mean and dividing by standard deviation
-#def standardize(tx):
-#    return (tx - np.mean(tx, axis=0)) / np.std(tx, axis=0)
-    
 
 # Adding 1-column at the data matrix 
 def add_constants(x, y):
@@ -64,27 +52,21 @@ def expand_data(degree, tx_tr, tx_te, tx_pred = None):
     ## Remove them so they will not be standardized or expanded
     jets_tr = jet_nums(tx_tr)
     jets_te= jet_nums(tx_te)
-    #jets_pred= jet_nums(tx_pred)
     ## Remove redundant columns
     res_tr = extract_col(tx_tr)
     res_te = extract_col(tx_te)
-    #red_pred = extract_col(tx_pred)
     ## Expand features to include polynomial terms
     res_tr = build_poly(tx_tr, degree)
     res_te = build_poly(tx_te, degree)
-    #res_pred = build_poly(tx_pred, degree)
     ## Standardize
     res_tr, mean, std = standardize(res_tr)
     res_te = (res_te-mean)/std
-    #res_pred = (res_pred-mean)/std
     ## Fix NaNs resulting from division by 0
     res_tr[np.isnan(res_tr)]=1
     res_te[np.isnan(res_te)]=1
-    #res_pred[np.isnan(res_pred)]=1
     ## Reconcatenate jet indicator columns
     res_tr = np.c_[res_tr, jets_tr]
     res_te = np.c_[res_te, jets_te]
-    #res_pred = np.c_[res_pred, jets_pred]
     return res_tr, res_te #, res_pred
 
 
@@ -105,7 +87,16 @@ def jet_nums(tx):
     result = np.c_[jet0, jet1, jet2, jet3]
     return result
 
+
 # Extract 22th column from the data
 def extract_col(tx):
     result = np.delete(tx, 22, axis=1)
     return result
+
+
+# Adding polynomial features up to the selected degree
+def build_poly(x, degree):
+    poly_x = np.ones((len(x), 1))
+    for d in range(1, degree+1):
+        poly_x = np.c_[poly_x, np.power(x, d)]
+    return poly_x

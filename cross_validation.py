@@ -30,8 +30,6 @@ def cross_validation(y, x, k_indices, k, lambda_, degree):
     tx_te = x[te_indice]
     tx_tr = x[tr_indice]
 
-    #tx_tr, tx_te = expand_data(degree, tx_tr, tx_te)
-
     # Preprocessing data: cleaning, standardazing and adding constant column
     tx_tr, tx_te = process_data(tx_tr, tx_te, y_tr, y_te)
 
@@ -43,22 +41,16 @@ def cross_validation(y, x, k_indices, k, lambda_, degree):
     print("Test: d = ", degree, "; l = ", lambda_)
 
     # Training with ridge regression
-    #w, loss = reg_logistic_regression(y_tr, tx_tr, lambda_, initial_w=np.zeros(tx_tr.shape[1]), max_iters=30, gamma=0.001)
-    #w, _ = least_squares_GD(y_tr, tx_tr, initial_w=np.zeros(tx_tr.shape[1]), max_iters=50, gamma=0.1)
-    #w, _ = least_squares_SGD(y_tr, tx_tr, initial_w=np.zeros(tx_tr.shape[1]), max_iters=100, gamma=0.01)
-    #w, _ = least_squares(y_tr, tx_tr)
-    w, _ = ridge_regression(y_tr, tx_tr, lambda_)
-    #w, _ = logistic_regression(y_tr, tx_tr, initial_w=np.zeros(tx_tr.shape[1]), max_iters=30, gamma=0.001)
-    #w, loss = reg_logistic_regression(y_tr, tx_tr, lambda_, initial_w=np.zeros(tx_tr.shape[1]), max_iters=30, gamma=0.1)
-
+    w, loss = ridge_regression(y_tr, tx_tr, lambda_)
+    
     # Computing prediction vector
     y_pred = predict_labels(w, tx_te)
     
-    # Computing loss and accuracy on test set 
-    loss_te = compute_loss(y_te, tx_te, w)
+    # Computing accuracy on test set 
     accuracy = compute_accuracy(y_te, y_pred)
 
-    print("Accuracy = ", accuracy, "; loss = ", loss_te, "\n")
+    # Log informations
+    print("Accuracy = ", accuracy, "; loss = ", loss, "\n")
 
     return loss_te, accuracy
 
@@ -74,22 +66,22 @@ def best_model_selection(x, y, degrees, k_fold, lambdas, seed = 10):
     best_acc = []
     # For each degree
     for degree in degrees:
-        losses_te = []
+        losses = []
         acc_te = []
         # For each lambda
         for lambda_ in lambdas:
-            losses_te_tmp = []
+            losses_tmp = []
             acc_te_tmp = []
             # For each split
             for k in range(k_fold):
                 # Using cross validation for each degree and lambda
-                loss_te, acc = cross_validation(y, x, k_indices, k, lambda_, degree)
+                loss, acc = cross_validation(y, x, k_indices, k, lambda_, degree)
                 # Saving accuracy and loss 
-                losses_te_tmp.append(loss_te)
+                losses_tmp.append(loss)
                 acc_te_tmp.append(acc)
 
             # Taking the mean of loss and accuracy for the cross validation iteration
-            losses_te.append(np.mean(losses_te_tmp))
+            losses.append(np.mean(losses_tmp))
             acc_te.append(np.mean(acc_te_tmp))
         
         # Selecting the best parameters for maximizing the accuracy

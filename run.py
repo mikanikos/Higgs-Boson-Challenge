@@ -1,9 +1,8 @@
 import numpy as np
 
-from implementations import *
+from implementations import ridge_regression
 from proj1_helpers import load_csv_data, predict_labels, create_csv_submission
-from data_processing import process_data, build_poly, clean_data, expand_data
-from cross_validation import best_model_selection, ridge_trials
+from data_processing import process_data, build_poly
 
 print("Loading data\n")
 
@@ -13,21 +12,7 @@ y_te, tx_te, ids_te = load_csv_data("data/test.csv")
 
 # Hyper-parameters definitions
 degree = 7
-lambda_ = 869.749
-
-#tx_tr, tx_te = process_data(tx_tr, tx_te, y_tr, y_te)
-
-# Cleaning data from missing values
-#tx_tr = clean_data(tx_tr)
-#tx_te = clean_data(tx_te)
-
-# Using cross validation in order to find the best lambda and degree for ridge_regression
-#print("Cross validation\n")
-#degree, lambda_ = best_model_selection(tx_tr, y_tr, np.arange(7,8), 2, np.logspace(1, 3, 6))
-print("Best degree: ", degree)
-print("Best lambda: ", lambda_, "\n")
-
-#tx_tr, tx_te = expand_data(degree, tx_tr, tx_te)
+lambda_ = 0.00025
 
 # Preprocessing data: cleaning, standardazing and adding constant column
 tx_tr, tx_te = process_data(tx_tr, tx_te, y_tr, y_te)
@@ -38,15 +23,7 @@ tx_te = build_poly(tx_te, degree)
 
 # Training with ridge regression
 print("Training the model\n")
-#weights, _ = ridge_regression(y_tr, tx_tr, lambda_)
-
-#weights, _ = least_squares_GD(y_tr, tx_tr, initial_w=np.zeros(tx_tr.shape[1]), max_iters=50, gamma=0.001)
-#weights, _ = least_squares_SGD(y_tr, tx_tr, initial_w=np.zeros(tx_tr.shape[1]), max_iters=30, gamma=0.001)
-#weights, _ = least_squares(y_tr, tx_tr)
 weights, _ = ridge_regression(y_tr, tx_tr, lambda_)
-#weights, _ = logistic_regression(y_tr, tx_tr, initial_w=np.zeros(tx_tr.shape[1]), max_iters=30, gamma=0.001)
-#weights, _ = reg_logistic_regression(y_tr, tx_tr, lambda_, initial_w=np.zeros(tx_tr.shape[1]), max_iters=100, gamma=0.01)
-
 
 # Computing prediction vector
 y_pred = predict_labels(weights, tx_te)

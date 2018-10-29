@@ -24,7 +24,7 @@ def sigmoid(t):
     return 1.0 / (1 + np.exp(-t))
 
 
-# Computing accuracy
+# Computing accuracy by comparing the predictions with the test vector
 def compute_accuracy(y_true, y_pred):
     return sum(np.array(y_pred) == np.array(y_true)) / float(len(y_true))
 
