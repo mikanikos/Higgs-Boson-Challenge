@@ -1,48 +1,51 @@
 import numpy as np
-import pandas as pd
 
 from implementations import *
-from proj1_helpers import *
-from helpers import *
-from cross_validation import *
+from proj1_helpers import load_csv_data, predict_labels, create_csv_submission
+from data_processing import process_data, build_poly, clean_data, expand_data
+from cross_validation import best_model_selection, ridge_trials
 
-# LOAD DATA
+print("Loading data\n")
+
+# Loading data from csv files
 y_tr, tx_tr, ids_tr = load_csv_data("data/train.csv")
 y_te, tx_te, ids_te = load_csv_data("data/test.csv")
 
+# Hyper-parameters definitions
+degree = 12
+lambda_ =  1e-08
 
-# HYPERPARAMETERS DEFINITION
-degree = 1
-lambda_ =  0.01 #0.0016681005372000592
-max_iters = 50
-gamma = 0.1
+#tx_tr, tx_te = process_data(tx_tr, tx_te, y_tr, y_te)
 
-# USING CROSS VALIDATION TO FIND THE BEST DEGREE AND LAMBDA
-degree, lambda_ = best_model_selection(tx_tr, y_tr, np.arange(7,8), 5, np.logspace(0, 5, 50))
+# Cleaning data from missing values
+tx_tr = clean_data(tx_tr)
+tx_te = clean_data(tx_te)
 
-print(degree, lambda_)
+# Using cross validation in order to find the best lambda and degree for ridge_regression
+print("Cross validation\n")
+degree, lambda_ = best_model_selection(tx_tr, y_tr, np.arange(12,13), 2, np.logspace(-10, -7, 3))
+print("Best degree: ", degree)
+print("Best lambda: ", lambda_, "\n")
 
-tx_tr, tx_te = preprocess_data(tx_tr, tx_te, y_tr, y_te)
+tx_tr, tx_te = expand_data(degree, tx_tr, tx_te)
 
-w = np.zeros(tx_tr.shape[1])
-#w = np.zeros((tx_tr.shape[1],1))
+# Preprocessing data: cleaning, standardazing and adding constant column
+#tx_tr, tx_te = process_data(tx_tr, tx_te, y_tr, y_te)
 
-# DATA AUGMENTATION WITH POLY
+# Feature augmentation through polynomials
 #tx_tr = build_poly(tx_tr, degree)
 #tx_te = build_poly(tx_te, degree)
 
-# TRAINING FUNCTIONS
-#weights, _ = least_squares_GD(y_tr, tx_tr, w, max_iters, gamma)
-#weights, _ = least_squares_SGD(y_tr, tx_tr, w, max_iters, gamma)
-#weights, _ = least_squares(y_tr, tx_tr)
-weights, _ = ridge_regression(y_tr, tx_tr, lambda_)
-#weights, _ = logistic_regression(y_tr, tx_tr, w, max_iters, gamma)
-#weights, _ = reg_logistic_regression(y_tr, tx_tr, lambda_, w, max_iters, gamma)
+# Training with ridge regression
+print("Training the model\n")
+#weights, _ = ridge_regression(y_tr, tx_tr, lambda_)
 
-# COMPUTE PREDICTION VECTOR AND ACCURACY
+weights, _ = reg_logistic_regression(y_tr, tx_tr, lambda_, initial_w=np.zeros(tx_tr.shape[1]), max_iters=100, gamma=0.1)
+
+# Computing prediction vector
 y_pred = predict_labels(weights, tx_te)
 
-print(compute_accuracy(y_te, y_pred))
+# Creating file for submission
+create_csv_submission(ids_te, y_pred, "prediction.csv")
 
-# CREATING FILE FOR SUBMISSION
-create_csv_submission(ids_te, y_pred, "result.csv")
+print("Done")

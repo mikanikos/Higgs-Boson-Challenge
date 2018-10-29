@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from helpers import *
+
+### Auxiliary functions for plotting
 
 
 def prediction(w0, w1, mean_x, std_x):
